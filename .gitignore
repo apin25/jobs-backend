@@ -1,0 +1,6 @@
+venv
+.env
+users/migrations
+users/__pycache__
+jobs/migrations
+jobs/__pycache__
