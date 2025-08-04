@@ -4,3 +4,4 @@ users/migrations
 users/__pycache__
 jobs/migrations
 jobs/__pycache__
+app/__pycache__
