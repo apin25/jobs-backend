@@ -35,9 +35,27 @@ def update_job(request, id):
 
 @authentication_classes([TokenAuthentication])
 @api_view(['GET'])
-def get_list_job():
+def get_list_job(request):
     now = timezone.now()
     jobs = Job.objects.filter(close_at__lte=now)
+
+    job_name = request.query_params.get('job_name')
+    company = request.query_params.get('company')
+    type_of_workplace = request.query_params.get('type_of_workplace')
+    employment_type = request.query_params.get('employment_type')
+
+    if job_name:
+        jobs = jobs.filter(job_position__icontains=job_name)
+    
+    if company:
+        jobs = jobs.filter(company__icontains=company)
+    
+    if type_of_workplace:
+        jobs = jobs.filter(type_of_workplace=type_of_workplace)
+    
+    if employment_type:
+        jobs = jobs.filter(employment_type=employment_type)
+
     serializer = JobSerializer(jobs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
