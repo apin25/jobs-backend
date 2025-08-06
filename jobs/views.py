@@ -2,13 +2,15 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from jobs.models import Job
 from jobs.serializers import JobSerializer
-from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.utils import timezone
 
 @authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['POST'])
 def add_job(request):
     serializer = JobSerializer(data=request.data)
@@ -19,6 +21,7 @@ def add_job(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['PUT'])
 def update_job(request, id):
     try:
@@ -34,6 +37,7 @@ def update_job(request, id):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_list_job(request):
     now = timezone.now()
@@ -60,6 +64,7 @@ def get_list_job(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['PUT'])
 def close_job(request, id):
     try:
@@ -77,7 +82,8 @@ def close_job(request, id):
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_job_detail(request, id):
     try:
