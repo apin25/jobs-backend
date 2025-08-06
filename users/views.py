@@ -10,7 +10,7 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.utils import timezone
 from datetime import timedelta
@@ -27,10 +27,12 @@ class ExpiringToken(Token):
         now = timezone.now()
         return self.created < now - timedelta(hours=24)
 
+@permission_classes([AllowAny])
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+@permission_classes([AllowAny])
 class LoginView(APIView):
     def post(self, request):
         username = request.data.get("username")
@@ -47,6 +49,8 @@ class LoginView(APIView):
             return Response({"token": token.key})
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 class LogoutView(APIView):
     def post(self, request):
         token_key = request.auth.key if request.auth else None
