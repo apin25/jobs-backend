@@ -160,7 +160,7 @@ Response
 Endpoint = https://jobs-backend-apin.vercel.app/api/job/update-job/:id
 
 Body dengan Bearer Token : b167c87bb67807aef0c7bb4875ecc345ea87d60a
-
+```
 {
     "job_position":"Software Engineer",
     "type_of_workplace":"On Site",
@@ -181,8 +181,10 @@ Response
     "description": "Dibuka untuk semua frash graduate dan upah 6juta",
     "is_deleted": false
 }
-####OPSI Employment Type sama Workplace
+```
 
+####OPSI Employment Type sama Workplace
+```
 TYPE_OF_WORKPLACE = [
     ("On Site", "On Site"),
     ("Hybrid", "Hybrid"),
@@ -196,6 +198,7 @@ EMPLOYMENT_TYPE = [
     ("Volunteer", "Volunteer"),
     ("Apprenticeship", "Apprenticeship")
 ]
+```
 
 #### 6. Detail Job - GET
 Endpoint = https://jobs-backend-apin.vercel.app/api/job/get-job-detail/:id
