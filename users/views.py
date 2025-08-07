@@ -1,8 +1,12 @@
 from django.shortcuts import render
 
 # Create your views here.
+from django.utils.timezone import now
+from datetime import timedelta
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 from rest_framework import generics
-from django.contrib.auth.models import User
+from django.contrib.auth.backends import ModelBackend
 from users.serializers import UserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -18,14 +22,7 @@ from django.db import models
 from rest_framework.authtoken.models import Token
 from django.utils import timezone
 from datetime import timedelta
-
-class ExpiringToken(Token):
-    class Meta:
-        proxy = True
-
-    def expired(self):
-        now = timezone.now()
-        return self.created < now - timedelta(hours=24)
+from .models import User, ExpiringToken
 
 @permission_classes([AllowAny])
 class RegisterView(generics.CreateAPIView):
@@ -39,12 +36,12 @@ class LoginView(APIView):
         password = request.data.get("password")
         user = authenticate(username=username, password=password)
         if user:
-            token, created = Token.objects.get_or_create(user=user)
+            token, created = ExpiringToken.objects.get_or_create(user=user)
 
             if not created:
-                if token.created < timezone.now() - timedelta(hours=1):
+                if token.created < timezone.now() - timedelta(hours=24):
                     token.delete()
-                    token = Token.objects.create(user=user)
+                    token = ExpiringToken.objects.create(user=user)
 
             return Response({"token": token.key})
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
