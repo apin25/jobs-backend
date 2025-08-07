@@ -9,10 +9,14 @@ from jobs.serializers import JobSerializer
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.utils import timezone
 
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+from utils.authentication import ExpiringTokenAuthentication
+
 @api_view(['POST'])
+@authentication_classes([ExpiringTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def add_job(request):
+    print("User:", request.user)
+    print("Is Authenticated:", request.user.is_authenticated)
     serializer = JobSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -20,9 +24,9 @@ def add_job(request):
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
 @api_view(['PUT'])
+@authentication_classes([ExpiringTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def update_job(request, id):
     try:
         job = Job.objects.get(id=id, is_deleted=False)
@@ -36,9 +40,9 @@ def update_job(request, id):
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@authentication_classes([ExpiringTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def get_list_job(request):
     jobs = Job.objects.filter(is_deleted=False)
 
@@ -62,9 +66,9 @@ def get_list_job(request):
     serializer = JobSerializer(jobs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
 @api_view(['PUT'])
+@authentication_classes([ExpiringTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def delete_job(request, id):
     try:
         job = Job.objects.get(id=id)
@@ -76,9 +80,9 @@ def delete_job(request, id):
 
     return Response({"detail": "Job successfully soft-deleted."}, status=status.HTTP_200_OK)
 
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
+@authentication_classes([ExpiringTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def get_job_detail(request, id):
     try:
         job = Job.objects.get(id=id, is_deleted=False)

@@ -22,6 +22,8 @@ from django.db import models
 from rest_framework.authtoken.models import Token
 from django.utils import timezone
 from datetime import timedelta
+
+from utils.authentication import ExpiringTokenAuthentication
 from .models import User, ExpiringToken
 
 @permission_classes([AllowAny])
@@ -56,12 +58,10 @@ class LogoutView(APIView):
             return Response({"success": "Logged out"})
         return Response({"error": "Not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
 
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_user_by_token(request, token_key):
     try:
-        token = Token.objects.get(key=token_key)
+        token = ExpiringToken.objects.get(key=token_key)
         user = token.user
 
         serializer = UserSerializer(user)
