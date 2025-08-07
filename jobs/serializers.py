@@ -4,4 +4,5 @@ from .models import Job
 class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
-        fields = ("id","job_position","job_location","company","employment_type","description","close_at")
+        fields = "__all__"
+        read_only_fields = ("is_deleted",)

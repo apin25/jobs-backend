@@ -25,7 +25,7 @@ def add_job(request):
 @api_view(['PUT'])
 def update_job(request, id):
     try:
-        job = Job.objects.get(id=id)
+        job = Job.objects.get(id=id, is_deleted=False)
     except Job.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -40,8 +40,7 @@ def update_job(request, id):
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_list_job(request):
-    now = timezone.now()
-    jobs = Job.objects.filter(close_at__lte=now)
+    jobs = Job.objects.filter(is_deleted=False)
 
     job_name = request.query_params.get('job_name')
     company = request.query_params.get('company')
@@ -66,28 +65,23 @@ def get_list_job(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['PUT'])
-def close_job(request, id):
+def delete_job(request, id):
     try:
         job = Job.objects.get(id=id)
     except Job.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "Job not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    data = request.data.copy()
-    data['close_at'] = timezone.now()
+    job.is_deleted = True
+    job.save()
 
-    serializer = JobSerializer(job, data=data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"detail": "Job successfully soft-deleted."}, status=status.HTTP_200_OK)
 
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_job_detail(request, id):
     try:
-        job = Job.objects.get(id=id)
+        job = Job.objects.get(id=id, is_deleted=False)
     except Job.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 

@@ -22,4 +22,4 @@ class Job(models.Model):
     company = models.CharField(max_length=255, blank=False)
     employment_type = models.CharField(max_length=255, blank=False, choices=EMPLOYMENT_TYPE)
     description = models.CharField(max_length=2048, blank=False)
-    close_at = models.DateTimeField(null=False)
+    is_deleted = models.BooleanField(default=False)
