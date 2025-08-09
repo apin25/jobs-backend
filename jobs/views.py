@@ -7,7 +7,7 @@ from rest_framework.authentication import TokenAuthentication
 from jobs.models import Job
 from jobs.serializers import JobSerializer
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from django.utils import timezone
+from django.db.models import Q
 
 from utils.authentication import ExpiringTokenAuthentication
 
@@ -46,16 +46,17 @@ def update_job(request, id):
 def get_list_job(request):
     jobs = Job.objects.filter(is_deleted=False)
 
-    job_position = request.query_params.get('job_position')
-    company = request.query_params.get('company')
+    # Satu parameter untuk search
+    search = request.query_params.get('search')
     type_of_workplace = request.query_params.get('type_of_workplace')
     employment_type = request.query_params.get('employment_type')
 
-    if job_position:
-        jobs = jobs.filter(job_position__icontains=job_position)
-    
-    if company:
-        jobs = jobs.filter(company__icontains=company)
+    if search:
+        search = search.strip()
+        jobs = jobs.filter(
+            Q(job_position__icontains=search) |
+            Q(company__icontains=search)
+        )
     
     if type_of_workplace:
         jobs = jobs.filter(type_of_workplace=type_of_workplace)
