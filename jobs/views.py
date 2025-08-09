@@ -46,13 +46,13 @@ def update_job(request, id):
 def get_list_job(request):
     jobs = Job.objects.filter(is_deleted=False)
 
-    job_name = request.query_params.get('job_name')
+    job_position = request.query_params.get('job_position')
     company = request.query_params.get('company')
     type_of_workplace = request.query_params.get('type_of_workplace')
     employment_type = request.query_params.get('employment_type')
 
-    if job_name:
-        jobs = jobs.filter(job_position__icontains=job_name)
+    if job_position:
+        jobs = jobs.filter(job_position__icontains=job_position)
     
     if company:
         jobs = jobs.filter(company__icontains=company)
